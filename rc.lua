@@ -12,6 +12,8 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 
+naughty.config.defaults.icon_size = 16
+
 -- Custom libraries
 local helpers = require("helpers")
 
@@ -19,6 +21,13 @@ local helpers = require("helpers")
 local myvolume = require("volume")
 local mybattery = require("battery")
 local mywifi = require("wifi")
+
+-- Get hostname
+local hostname = io.popen("uname -n"):read()
+
+-- Before anything else
+awful.util.spawn_with_shell("sh ~/.screenlayout/default.sh")
+awful.util.spawn_with_shell("sh ~/.startup/mouse.sh")
 
 -- Load Debian menu entries
 require("debian.menu")
@@ -54,7 +63,7 @@ end
 beautiful.init("~/.config/awesome/themes/current/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "x-terminal-emulator"
+terminal = "mate-terminal"
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -77,9 +86,9 @@ local layouts =
     --awful.layout.suit.spiral,
     --awful.layout.suit.spiral.dwindle,
     awful.layout.suit.max,
-    awful.layout.suit.tile,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier
+    awful.layout.suit.tile
+    --awful.layout.suit.max.fullscreen,
+    --awful.layout.suit.magnifier
 }
 -- }}}
 
@@ -96,7 +105,6 @@ end
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    --tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
     tags[s] = awful.tag({ " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 " }, s, layouts[1])
 end
 -- }}}
@@ -180,7 +188,7 @@ function tasklistupdate(w, buttons, labelfunc, data, objects)
         local iconsrc = o.icon
 
         if iconsrc == nil or iconsrc == "" then
-            iconsrc = "/usr/share/icons/gnome/scalable/emblems/emblem-system-symbolic.svg"
+            iconsrc = "/home/mrzapp/config/awesome/themes/current/icons/gnome/scalable/emblems/emblem-system-symbolic.svg"
         end
 
         -- Update background
@@ -326,17 +334,19 @@ for s = 1, screen.count() do
             right_layout:add(mybattery.text)
         end
         
-        if mywifi.haswifi then
-            right_layout:add(separator)
-            right_layout:add(mywifi.icon)
-            right_layout:add(mywifi.text)
-        end
+        -- Not needed since nm-applet was introduced
+        -- if mywifi.haswifi then
+        --     right_layout:add(separator)
+        --     right_layout:add(mywifi.icon)
+        --     right_layout:add(mywifi.text)
+        -- end
 
         right_layout:add(separatorbig)
         right_layout:add(mytextclock)
-        right_layout:add(mylayoutbox[s])
     end
 
+    right_layout:add(mylayoutbox[s])
+    
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
     layout:set_left(left_layout)
@@ -393,7 +403,6 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show() end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
@@ -447,13 +456,26 @@ globalkeys = awful.util.table.join(
                   awful.util.getdir("cache") .. "/history_eval")
               end),
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end)
+    awful.key({ modkey }, "s", function() menubar.show() end),
+    
+    -- Browser
+    awful.key({ modkey }, "w", function() awful.util.spawn("sensible-browser") end),
+    
+    -- Settings
+    awful.key({ modkey, "Shift"  }, "c", function() awful.util.spawn("mate-control-center") end),
+
+    -- Screenshot
+    awful.key({ modkey, "Shift"  }, "s", function() awful.util.spawn_with_shell("mate-screenshot -a") end),
+
+    -- Layouts
+    awful.key({ modkey, "Control", "Shift" }, "space", function() awful.util.spawn("setxkbmap us") end),
+    awful.key({ modkey, "Control"  }, "space", function() awful.util.spawn("setxkbmap da") end)
 )
 
 clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
-    awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
-    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
+    awful.key({ modkey,           }, "q",      function (c) c:kill()                         end),
+    --awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end),
@@ -541,9 +563,6 @@ awful.rules.rules = {
       properties = { tag = tags[1][4] } },
     { rule = { class = "Slack" },
       properties = { tag = tags[1][4] } },
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
 }
 -- }}}
 
@@ -621,9 +640,13 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- }}}
 
 -- {{{ Autorun apps
-awful.util.spawn("guake", false)
-awful.util.spawn("kupfer --no-splash", false)
-awful.util.spawn("dropbox start", false)
-awful.util.spawn("/opt/telegram/Telegram", false)
-awful.util.spawn("/usr/share/slack/slack %U", false)
+local r = require("runonce");
+
+r.run("guake", false)
+r.run("dropbox start", false)
+r.run("/opt/telegram/Telegram", false)
+r.run("slack", false)
+r.run("nm-applet", false)
+r.run("xcompmgr &", false)
+r.run("mate-settings-daemon", false)
 -- }}}

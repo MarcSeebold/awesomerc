@@ -14,7 +14,7 @@ helpers:set_draw_method(widget.icon)
 
 -- {{{ Define interactive behaviour
 widget.icon:buttons(awful.util.table.join(
-    awful.button({ }, 1, function () awful.util.spawn("gnome-control-center sound") end)
+--    awful.button({ }, 1, function () awful.util.spawn("gnome-control-center sound") end)
 ))
 -- }}}
 
@@ -28,7 +28,7 @@ function widget:update()
 
     widget.text:set_markup(volume .. "%")
 
-    local iconpath = "/usr/share/icons/gnome/scalable/status/audio-volume" 
+    local iconpath = "/home/mrzapp/.config/awesome/themes/current/icons/gnome/scalable/status/audio-volume" 
 
     if string.find(status, "[off]", 1, true) or volume <= 0.0 then
         iconpath = iconpath .. "-muted"

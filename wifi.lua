@@ -27,7 +27,7 @@ helpers:set_draw_method(widget.icon)
 
 -- {{{ Define interactive behaviour
 widget.icon:buttons(awful.util.table.join(
-    awful.button({ }, 1, function () awful.util.spawn("gnome-control-center network") end)
+    awful.button({ }, 1, function () awful.util.spawn("wicd-gtk") end)
 ))
 -- }}}
 
@@ -52,7 +52,7 @@ function widget:update()
 
     widget.text:set_markup(text)
 
-    local iconpath = "/usr/share/icons/gnome/scalable/status/network-wireless-signal"
+    local iconpath = "/home/mrzapp/.config/awesome/themes/current/icons/gnome/scalable/status/network-wireless-signal"
     
     if quality <= 0 then
         iconpath = iconpath .. "-none"

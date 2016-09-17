@@ -29,7 +29,7 @@ helpers:set_draw_method(widget.icon)
 
 -- {{{ Define interactive behaviour
 widget.icon:buttons(awful.util.table.join(
-    awful.button({ }, 1, function () awful.util.spawn("gnome-control-center power") end)
+    -- awful.button({ }, 1, function () awful.util.spawn("gnome-control-center power") end)
 ))
 -- }}}
 
@@ -44,7 +44,7 @@ function widget:update()
 
     if cur and cap then
         local battery = math.floor(cur * 100 / cap)
-        local iconpath = "/usr/share/icons/gnome/scalable/status/battery"
+        local iconpath = "/home/mrzapp/.config/awesome/themes/current/icons/gnome/scalable/status/battery"
        
         if(battery < 10) then
             iconpath = iconpath .. "-caution"
