@@ -21,6 +21,7 @@ local helpers = require("helpers")
 local myvolume = require("volume")
 local mybattery = require("battery")
 local mywifi = require("wifi")
+local APW = require("apw/widget") -- pulse audio
 
 -- Get hostname
 local hostname = io.popen("uname -n"):read()
@@ -28,6 +29,13 @@ local hostname = io.popen("uname -n"):read()
 -- Before anything else
 awful.util.spawn_with_shell("sh ~/.screenlayout/default.sh")
 awful.util.spawn_with_shell("sh ~/.startup/mouse.sh")
+awful.util.spawn_with_shell("sh ~/.startup/other.sh")
+
+
+-- Periodic update of pulse audio widget
+APWTimer = timer({ timeout = 0.5 }) -- set update interval in s
+APWTimer:connect_signal("timeout", APW.Update)
+APWTimer:start()
 
 -- Load Debian menu entries
 require("debian.menu")
@@ -63,7 +71,7 @@ end
 beautiful.init("~/.config/awesome/themes/current/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "mate-terminal"
+terminal = "terminator"
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -77,18 +85,18 @@ modkey = "Mod4"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
-    --awful.layout.suit.floating,
-    --awful.layout.suit.tile.left,
-    --awful.layout.suit.tile.bottom,
-    --awful.layout.suit.tile.top,
+    awful.layout.suit.tile,
     --awful.layout.suit.fair,
-    --awful.layout.suit.fair.horizontal,
-    --awful.layout.suit.spiral,
-    --awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max,
-    awful.layout.suit.tile
-    --awful.layout.suit.max.fullscreen,
-    --awful.layout.suit.magnifier
+    --awful.layout.suit.max,
+    awful.layout.suit.floating,
+    awful.layout.suit.tile.left,
+    awful.layout.suit.tile.bottom,
+    awful.layout.suit.tile.top,
+    awful.layout.suit.fair.horizontal,
+    awful.layout.suit.spiral,
+    awful.layout.suit.spiral.dwindle,
+    awful.layout.suit.max.fullscreen,
+    awful.layout.suit.magnifier
 }
 -- }}}
 
@@ -228,7 +236,7 @@ function tasklistupdate(w, buttons, labelfunc, data, objects)
 end
 
 -- Create a textclock widget
-mytextclock = awful.widget.textclock()
+mytextclock = awful.widget.textclock("%a %b %m/%d, %I:%M %p")
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -327,6 +335,7 @@ for s = 1, screen.count() do
         right_layout:add(mysystraymargin)
         right_layout:add(myvolume.icon)
         right_layout:add(myvolume.text)
+        right_layout:add(APW)
 
         if mybattery.hasbattery then
             right_layout:add(separator)
@@ -393,6 +402,9 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
 
+    -- Lock screen
+    awful.key({ modkey,           }, "l", function () awful.util.spawn("xscreensaver-command -lock", false) end),
+
     awful.key({ modkey,           }, "j",
         function ()
             awful.client.focus.byidx( 1)
@@ -418,15 +430,16 @@ globalkeys = awful.util.table.join(
             end
         end),
 
+    -- Screenshots
+    awful.key({ modkey, }, "Print", function () awful.util.spawn("shutter -s") end),
+
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
     awful.key({ modkey, "Control" }, "r", awesome.restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
-    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
-    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
+    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incmwfact( 0.05)    end),
+    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incmwfact(-0.05)    end),
     awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
@@ -642,11 +655,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 -- {{{ Autorun apps
 local r = require("runonce");
 
-r.run("guake", false)
-r.run("dropbox start", false)
-r.run("/opt/telegram/Telegram", false)
-r.run("slack", false)
 r.run("nm-applet", false)
-r.run("xcompmgr &", false)
-r.run("mate-settings-daemon", false)
+-- r.run("xcompmgr &", false) -- Know to cause 100% cpu usage
+r.run("gnome-settings-daemon", false)
 -- }}}
