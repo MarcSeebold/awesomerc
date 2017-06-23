@@ -28,7 +28,7 @@ function widget:update()
 
     widget.text:set_markup(volume .. "%")
 
-    local iconpath = "/home/mrzapp/.config/awesome/themes/current/icons/gnome/scalable/status/audio-volume" 
+    local iconpath = "/home/marc/.config/awesome/themes/current/icons/gnome/scalable/status/audio-volume" 
 
     if string.find(status, "[off]", 1, true) or volume <= 0.0 then
         iconpath = iconpath .. "-muted"

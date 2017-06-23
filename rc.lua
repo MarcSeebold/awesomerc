@@ -1,4 +1,4 @@
--- Standard awesome library
+-- Standard awesome lebrary
 local gears = require("gears")
 local awful = require("awful")
 local common = require("awful.widget.common") 
@@ -20,7 +20,7 @@ local helpers = require("helpers")
 -- Custom widgets
 local myvolume = require("volume")
 local mybattery = require("battery")
-local mywifi = require("wifi")
+-- local mywifi = require("wifi")
 local APW = require("apw/widget") -- pulse audio
 
 -- Get hostname
@@ -33,12 +33,12 @@ awful.util.spawn_with_shell("sh ~/.startup/other.sh")
 
 
 -- Periodic update of pulse audio widget
-APWTimer = timer({ timeout = 0.5 }) -- set update interval in s
-APWTimer:connect_signal("timeout", APW.Update)
-APWTimer:start()
+-- APWTimer = timer({ timeout = 0.5 }) -- set update interval in s
+-- APWTimer:connect_signal("timeout", APW.Update)
+-- APWTimer:start()
 
 -- Load Debian menu entries
-require("debian.menu")
+-- require("debian.menu")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -127,7 +127,7 @@ myawesomemenu = {
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "Debian", debian.menu.Debian_menu.Debian },
+--                                    { "Debian", debian.menu.Debian_menu.Debian },
                                     { "open terminal", terminal }
                                   }
                         })
@@ -159,9 +159,6 @@ function tasklistupdate(w, buttons, labelfunc, data, objects)
         -- Init widget cache
         local cache = data[o]
 
-        -- Get client informaion
-        local text, bg, bg_image, icon = labelfunc(o)
-        
         -- If cache is defined, use cache
         if cache then
             icon = cache.icon
@@ -192,11 +189,14 @@ function tasklistupdate(w, buttons, labelfunc, data, objects)
             helpers:set_draw_method(icon)
         end
 
+        -- Get client informaion
+        local text, bg, bg_image = labelfunc(o, label)
+
         -- Use a fallback for clients without icons
         local iconsrc = o.icon
 
         if iconsrc == nil or iconsrc == "" then
-            iconsrc = "/home/mrzapp/config/awesome/themes/current/icons/gnome/scalable/emblems/emblem-system-symbolic.svg"
+            iconsrc = "/home/marc/.config/awesome/themes/current/icons/gnome/scalable/emblems/emblem-system-symbolic.svg"
         end
 
         -- Update background
@@ -289,7 +289,7 @@ mytasklist.buttons = awful.util.table.join(
                                           end))
 
 
-for s = 1, screen.count() do
+for s= 1, screen.count() do
     -- Widgets
     local separator = wibox.widget.imagebox()
     separator:set_image(beautiful.get().spr2px)
@@ -311,7 +311,7 @@ for s = 1, screen.count() do
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons, nil, tasklistupdate)
+    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons, {}, tasklistupdate)
 
     -- Create a systray widget
     local mysystray = wibox.widget.systray()
@@ -459,12 +459,12 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control"   }, "q", function () awful.util.spawn("gksudo poweroff", false) end),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen.index]:run() end),
 
     awful.key({ modkey }, "x",
               function ()
                   awful.prompt.run({ prompt = "Run Lua code: " },
-                  mypromptbox[mouse.screen].widget,
+                  mypromptbox[mouse.screen.index].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
               end),
@@ -479,6 +479,7 @@ globalkeys = awful.util.table.join(
 
     -- Screenshot
     awful.key({ modkey, "Shift"  }, "s", function() awful.util.spawn_with_shell("mate-screenshot -a") end),
+    awful.key({ }, "Print", function() awful.util.spawn("xfce4-screenshoter") end),
 
     -- Layouts
     awful.key({ modkey, "Control", "Shift" }, "space", function() awful.util.spawn("setxkbmap us") end),
@@ -513,7 +514,7 @@ for i = 1, 9 do
         -- View tag only.
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
-                        local screen = mouse.screen
+                        local screen = mouse.screen.index
                         local tag = awful.tag.gettags(screen)[i]
                         if tag then
                            awful.tag.viewonly(tag)
@@ -522,7 +523,7 @@ for i = 1, 9 do
         -- Toggle tag.
         awful.key({ modkey, "Control" }, "#" .. i + 9,
                   function ()
-                      local screen = mouse.screen
+                      local screen = mouse.screen.index
                       local tag = awful.tag.gettags(screen)[i]
                       if tag then
                          awful.tag.viewtoggle(tag)
@@ -656,6 +657,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 local r = require("runonce");
 
 r.run("nm-applet", false)
+r.run("xscreensaver", false)
 -- r.run("xcompmgr &", false) -- Know to cause 100% cpu usage
 r.run("gnome-settings-daemon", false)
 -- }}}

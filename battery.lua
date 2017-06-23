@@ -44,7 +44,7 @@ function widget:update()
 
     if cur and cap then
         local battery = math.floor(cur * 100 / cap)
-        local iconpath = "/home/mrzapp/.config/awesome/themes/current/icons/gnome/scalable/status/battery"
+        local iconpath = "/home/marc/.config/awesome/themes/current/icons/gnome/scalable/status/battery"
        
         if(battery < 10) then
             iconpath = iconpath .. "-caution"

@@ -52,7 +52,7 @@ function widget:update()
 
     widget.text:set_markup(text)
 
-    local iconpath = "/home/mrzapp/.config/awesome/themes/current/icons/gnome/scalable/status/network-wireless-signal"
+    local iconpath = "/home/marc/.config/awesome/themes/current/icons/gnome/scalable/status/network-wireless-signal"
     
     if quality <= 0 then
         iconpath = iconpath .. "-none"
