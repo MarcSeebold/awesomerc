@@ -430,8 +430,9 @@ globalkeys = awful.util.table.join(
             end
         end),
 
-    -- Screenshots
-    awful.key({ modkey, }, "Print", function () awful.util.spawn("shutter -s") end),
+    -- Screenshots (we use xfce4 screenshot here instead)
+    -- awful.key({ modkey, }, "Print", function () awful.util.spawn("shutter -s") end),
+    awful.key({ }, "Print", function() awful.util.spawn("xfce4-screenshooter") end),
 
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
@@ -479,7 +480,6 @@ globalkeys = awful.util.table.join(
 
     -- Screenshot
     awful.key({ modkey, "Shift"  }, "s", function() awful.util.spawn_with_shell("mate-screenshot -a") end),
-    awful.key({ }, "Print", function() awful.util.spawn("xfce4-screenshoter") end),
 
     -- Layouts
     awful.key({ modkey, "Control", "Shift" }, "space", function() awful.util.spawn("setxkbmap us") end),
