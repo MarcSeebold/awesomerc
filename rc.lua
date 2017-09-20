@@ -657,6 +657,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 local r = require("runonce");
 
 r.run("nm-applet", false)
+r.run("blueman-applet", false)
 r.run("xscreensaver", false)
 -- r.run("xcompmgr &", false) -- Know to cause 100% cpu usage
 r.run("gnome-settings-daemon", false)
