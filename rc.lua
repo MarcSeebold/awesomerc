@@ -1,5 +1,5 @@
 -- Standard awesome lebrary
-local gears = require("gears")
+-- local gears = require("gears")
 local awful = require("awful")
 local common = require("awful.widget.common") 
 awful.rules = require("awful.rules")
@@ -27,9 +27,9 @@ local APW = require("apw/widget") -- pulse audio
 local hostname = io.popen("uname -n"):read()
 
 -- Before anything else
-awful.util.spawn_with_shell("sh ~/.screenlayout/default.sh")
-awful.util.spawn_with_shell("sh ~/.startup/mouse.sh")
-awful.util.spawn_with_shell("sh ~/.startup/other.sh")
+awful.spawn.with_shell("sh ~/.screenlayout/default.sh")
+awful.spawn.with_shell("sh ~/.startup/mouse.sh")
+awful.spawn.with_shell("sh ~/.startup/other.sh")
 
 
 -- Periodic update of pulse audio widget
@@ -101,11 +101,11 @@ local layouts =
 -- }}}
 
 -- {{{ Wallpaper
-if beautiful.wallpaper then
-    for s = 1, screen.count() do
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
-    end
-end
+-- if beautiful.wallpaper then
+--     for s = 1, screen.count() do
+--         gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+--     end
+-- end
 -- }}}
 
 -- {{{ Tags
@@ -479,7 +479,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"  }, "c", function() awful.util.spawn("mate-control-center") end),
 
     -- Screenshot
-    awful.key({ modkey, "Shift"  }, "s", function() awful.util.spawn_with_shell("mate-screenshot -a") end),
+    awful.key({ modkey, "Shift"  }, "s", function() awful.spawn.with_shell("mate-screenshot -a") end),
 
     -- Layouts
     awful.key({ modkey, "Control", "Shift" }, "space", function() awful.util.spawn("setxkbmap us") end),
@@ -659,6 +659,7 @@ local r = require("runonce");
 r.run("nm-applet", false)
 r.run("blueman-applet", false)
 r.run("xscreensaver", false)
+r.run("/usr/lib/bluetooth/obexd&", false)
 -- r.run("xcompmgr &", false) -- Know to cause 100% cpu usage
 r.run("gnome-settings-daemon", false)
 -- }}}
